@@ -83,12 +83,13 @@ const AdminLayout = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="flex h-16 items-center justify-between">
             {/* Logo (Left) */}
-            <div className="flex-1 flex justify-start">
+            <div className="flex-1 flex justify-start items-center space-x-3">
               <img
                 src={logo}
                 alt="Logo"
-                className="h-8 w-auto transition-transform duration-500 hover:scale-105"
+                className="h-12 w-auto transition-transform duration-500 hover:scale-105"
               />
+              <h6 className='font-bold'>MMI Ticket System</h6>
             </div>
 
             {/* Navigation (Center) - Absolutely positioned to center */}
