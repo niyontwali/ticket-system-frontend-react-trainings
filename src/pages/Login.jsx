@@ -6,13 +6,16 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import { setCredentials } from "../redux/reducers/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import useAuth from "../hooks/useAuth"; // Import the useAuth hook
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { userToken } = useSelector((state) => state.auth);
+
+  // Use the auth hook to check both token and user
+  const { token, user } = useAuth();
 
   const [login, { isLoading }] = useLoginMutation();
 
@@ -28,19 +31,18 @@ const Login = () => {
         setError(result.message);
       } else {
         dispatch(setCredentials(result.token));
-
-        navigate('tickets');
       }
     } catch (error) {
-      setError(error.data.message);
+      setError(error.data?.message || "Login failed. Please try again.");
     }
   };
 
+  // Check both token and user to ensure we're fully authenticated
   useEffect(() => {
-    if (userToken) {
+    if (token && user) {
       navigate('tickets');
     }
-  }, [userToken, navigate]);
+  }, [token, user, navigate]);
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-card p-6 md:p-10">

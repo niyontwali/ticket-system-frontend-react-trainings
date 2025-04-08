@@ -16,8 +16,6 @@ const baseQuery = fetchBaseQuery({
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    console.log(token);
-
     // Add CORS-specific headers
     headers.set('Accept', 'application/json');
     headers.set('Content-Type', 'application/json');
@@ -39,6 +37,24 @@ export const apiSlice = createApi({
         url: 'login',
         method: 'POST',
         body: data,
+      }),
+    }),
+
+    // Add this to your existing apiSlice endpoints
+    forgotPassword: builder.mutation({
+      query: (credentials) => ({
+        url: '/forgot-password',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+
+    // Add this to your existing apiSlice endpoints
+    resetPassword: builder.mutation({
+      query: (credentials) => ({
+        url: '/auth/reset-password',
+        method: 'POST',
+        body: credentials,
       }),
     }),
 
@@ -91,7 +107,7 @@ export const apiSlice = createApi({
     // Endpoint to update an existing ticket
     // Takes an ID and new data, sends a PUT request
     updateTicket: builder.mutation({
-      query: ({id, data}) => {
+      query: ({ id, data }) => {
         return ({
           url: `/tickets/${id}`,
           method: 'PUT',
@@ -126,6 +142,8 @@ export const apiSlice = createApi({
 // These are used inside React components to call the endpoints
 export const {
   useLoginMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   useLogoutMutation,
   useGetCurrentUserQuery,
   useGetTicketsQuery,

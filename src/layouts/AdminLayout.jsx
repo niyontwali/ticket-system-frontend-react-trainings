@@ -1,25 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Menu, Ticket, LogOut, User, X, Loader2 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, Ticket, LogOut, User, X, Loader2 } from 'lucide-react';
 
-// Import RTK Query hooks
-import { useGetCurrentUserQuery, useLogoutMutation } from '../redux/api/apiSlice';
+// Import useAuth hook
+import useAuth from '../hooks/useAuth';
+
+// Import the logout action
+import { logout } from '../redux/reducers/authSlice';
+
+// Import logout mutation
+import { useLogoutMutation } from '../redux/api/apiSlice';
 
 // Assuming logo is imported this way
 import logo from '../assets/mmi_logo.png';
-import { logout } from '../redux/reducers/authSlice';
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
   const dropdownRef = useRef(null);
 
+  // Use the auth hook for user data
+  const { user, isLoading: isUserLoading } = useAuth();
 
-  // RTK Query hooks
-  const { data: user, isLoading: isUserLoading } = useGetCurrentUserQuery();
+  // Keep the logout mutation separate (not in useAuth)
   const [logoutUser, { isLoading: isLoggingOut }] = useLogoutMutation();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -30,12 +35,13 @@ const AdminLayout = ({ children }) => {
     setIsSidebarOpen(false);
   };
 
+  // Keep logout logic in the layout component
   const handleLogout = async () => {
     try {
       // Call the logout mutation
       await logoutUser().unwrap();
 
-      // Dispatch the Redux logout action to clear local state
+      // Then dispatch the Redux logout action
       dispatch(logout());
 
       // Navigate to login page
@@ -57,7 +63,7 @@ const AdminLayout = ({ children }) => {
   };
 
   // User's first initial for avatar
-  const userInitial = user?.data?.name?.[0];
+  const userInitial = user?.name?.[0];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -209,9 +215,9 @@ const AdminLayout = ({ children }) => {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium">{isUserLoading ? 'Loading...' : user?.data?.name}</p>
+                    <p className="font-medium">{isUserLoading ? 'Loading...' : user?.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {isUserLoading ? 'user@example.com' : user?.data?.email}
+                      {isUserLoading ? 'user@example.com' : user?.email}
                     </p>
                   </div>
                 </div>
@@ -255,7 +261,7 @@ const AdminLayout = ({ children }) => {
       {/* Main Content with subtle animation */}
       <main className="flex-1 bg-muted/40 py-8 animate-in fade-in duration-1000">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>

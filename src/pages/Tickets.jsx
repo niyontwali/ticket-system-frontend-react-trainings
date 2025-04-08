@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../layouts/AdminLayout";
 import { Search, Filter } from "lucide-react";
 import { useGetTicketsQuery } from "../redux/api/apiSlice";
 import DataTable from "../components/Table";
@@ -8,11 +7,13 @@ import Select from "../components/Select";
 import Badge from "../components/Badge";
 import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
+import useAuth from "../hooks/useAuth";
 
 const Tickets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const { isStaff } = useAuth();
 
   const statusOptions = [
     { value: "all", label: "All Status" },
@@ -123,62 +124,61 @@ const Tickets = () => {
   ];
 
   return (
-    <Layout>
-      <div className="px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Support Tickets</h1>
-          <Button
-            type="button"
-            content="New Ticket"
-            onClick={() => console.log("Create new ticket")}
-          />
-        </div>
+    <div className="px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Support Tickets</h1>
+        {isStaff && <Button
+          type="button"
+          content="New Ticket"
+          onClick={() => console.log("Create new ticket")}
+        />}
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search tickets..."
-                className="flex h-10 w-full rounded-md border border-input bg-background px-10 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring focus-visible:ring-offset-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground disabled:opacity-50 placeholder:pl-2"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
             </div>
-
-            <div className="flex gap-4">
-              <Select
-                options={statusOptions}
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                icon={Filter}
-                className="min-w-[180px]"
-              />
-
-              <Select
-                options={priorityOptions}
-                value={priorityFilter}
-                onChange={(e) => setPriorityFilter(e.target.value)}
-                icon={Filter}
-                className="min-w-[180px]"
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Search tickets..."
+              className="flex h-10 w-full rounded-md border border-input bg-background px-10 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring focus-visible:ring-offset-1 focus-visible:ring-primary/20 placeholder:text-muted-foreground disabled:opacity-50 placeholder:pl-2"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
-          <DataTable
-            data={filteredTickets}
-            columns={ticketColumns}
-            isLoading={isLoading}
-            isError={isError}
-            errorMessage="Error loading tickets!"
-            emptyMessage="No tickets found."
-          />
+          <div className="flex gap-4">
+            <Select
+              options={statusOptions}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              icon={Filter}
+              className="min-w-[180px]"
+            />
+
+            <Select
+              options={priorityOptions}
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+              icon={Filter}
+              className="min-w-[180px]"
+            />
+          </div>
         </div>
+
+        <DataTable
+          data={filteredTickets}
+          columns={ticketColumns}
+          isLoading={isLoading}
+          isError={isError}
+          errorMessage="Error loading tickets!"
+          emptyMessage="No tickets found."
+        />
       </div>
-    </Layout>
+    </div>
   );
 };
 
