@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import { setCredentials } from "../redux/reducers/authSlice";
 import { useDispatch } from "react-redux";
-import useAuth from "../hooks/useAuth"; // Import the useAuth hook
+import useAuth from "../hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
