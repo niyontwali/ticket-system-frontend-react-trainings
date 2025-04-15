@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetTicketQuery, useCreateCommentMutation, useUpdateTicketMutation, useGetTicketsQuery } from '../redux/api/apiSlice';
+import { useGetTicketQuery, useCreateCommentMutation, useUpdateTicketMutation, useGetTicketsQuery, useDeleteTicketMutation } from '../redux/api/apiSlice';
 import { Loader2, MessageSquare, Send, ArrowLeft, Save, User, Mail, Calendar, Clock, AlertCircle, Copy, Star } from 'lucide-react';
 import Select from '../components/Select';
 import toast from 'react-hot-toast';
@@ -29,6 +29,7 @@ const TicketDetails = () => {
   const { refetch: refetchTickets } = useGetTicketsQuery();
   const [addComment, { isLoading: isAddingComment }] = useCreateCommentMutation();
   const [updateTicket, { isLoading: isUpdatingTicket }] = useUpdateTicketMutation();
+  const [deleteTicket, { isLoading: isDeleting }] = useDeleteTicketMutation();
 
   // Set initial status and priority when ticket data loads
   useEffect(() => {
@@ -79,6 +80,23 @@ const TicketDetails = () => {
       }
     } catch (error) {
       toast.error(error.data.message || 'Failed to update ticket');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) {
+      try {
+        const res = await deleteTicket(id).unwrap();
+        if (res.ok) {
+          await refetchTickets();
+          toast.success(res.message || 'Ticket deleted successfully');
+          navigate('/tickets');
+        } else {
+          toast.error(res.message || 'Failed to delete ticket');
+        }
+      } catch (error) {
+        toast.error(error.data?.message || 'Failed to delete ticket');
+      }
     }
   };
 
@@ -369,6 +387,8 @@ const TicketDetails = () => {
             )}
           </div>
 
+
+
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground mb-2 flex items-center gap-1">
@@ -409,6 +429,29 @@ const TicketDetails = () => {
                 </div>
               )}
             </div>
+
+            {(isStaff) && (
+              <div className="mt-6 pt-4 border-t border-muted/20">
+                <div className="text-sm text-muted-foreground mb-2">
+                  <span className="text-red-600 font-medium">Danger Zone:</span> <br />You can delete this ticket.
+                  Clicking delete will permanently remove it and this action cannot be undone.
+                </div>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:bg-red-400 transition-colors flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="animate-spin h-4 w-4" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Ticket'
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

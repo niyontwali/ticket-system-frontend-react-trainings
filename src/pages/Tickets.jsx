@@ -5,6 +5,8 @@ import DataTable from "../components/Table";
 import Button from "../components/Button";
 import Select from "../components/Select";
 import Badge from "../components/Badge";
+import Modal from "../components/Modal";
+import NewTicketForm from "../components/NewTicketForm";
 import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import useAuth from "../hooks/useAuth";
@@ -13,6 +15,7 @@ const Tickets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { isStaff } = useAuth();
 
   const statusOptions = [
@@ -29,7 +32,12 @@ const Tickets = () => {
     { value: "high", label: "High" },
   ];
 
-  const { data: tickets = [], isLoading, isError } = useGetTicketsQuery();
+  const { data: tickets = [], isLoading, isError, refetch } = useGetTicketsQuery();
+
+  const handleNewTicketSuccess = () => {
+    // Refetch tickets after a new one is created
+    refetch();
+  };
 
   const filteredTickets = tickets?.data?.filter(ticket => {
     const matchesSearch = ticket.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -127,12 +135,13 @@ const Tickets = () => {
     <div className="px-4 py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Support Tickets</h1>
-        {isStaff && <Button
-          type="button"
-          content="New Ticket"
-          onClick={() => console.log("Create new ticket")}
-        />}
-
+        {isStaff && (
+          <Button
+            type="button"
+            content="New Ticket"
+            onClick={() => setIsModalOpen(true)}
+          />
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
@@ -178,9 +187,21 @@ const Tickets = () => {
           emptyMessage="No tickets found."
         />
       </div>
+      
+      {/* New Ticket Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Create New Support Ticket"
+        size="lg"
+      >
+        <NewTicketForm 
+          onClose={() => setIsModalOpen(false)} 
+          onSuccess={handleNewTicketSuccess}
+        />
+      </Modal>
     </div>
   );
 };
-
 
 export default Tickets;

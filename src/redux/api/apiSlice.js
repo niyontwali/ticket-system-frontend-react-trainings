@@ -67,6 +67,15 @@ export const apiSlice = createApi({
       }),
     }),
 
+    // Endpoint to get the users info
+    // Sends a GET request to /users
+    getUsers: builder.query({
+      query: () => ({
+        url: '/users',
+        method: 'GET',
+      }),
+    }),
+
     // Endpoint to get the currently logged-in user's info
     // Sends a GET request to /users/me
     getCurrentUser: builder.query({
@@ -145,6 +154,7 @@ export const {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   useLogoutMutation,
+  useGetUsersQuery,
   useGetCurrentUserQuery,
   useGetTicketsQuery,
   useGetTicketQuery,
